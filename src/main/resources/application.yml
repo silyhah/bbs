@@ -1,0 +1,41 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+    session:
+      timeout: PT60M
+
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.231.128:3306/rain?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: password
+  mail:
+    username: 2664067940@qq.com
+    password: bvqulykzolhsdiad
+    port: 465
+    properties:
+      mail:
+        debug: true
+        smtp:
+          socketFactory:
+            class :javax.net.ssl.SSLSocketFactory
+project:
+  folder: D://untitled/bbs/
+inner:
+  api:
+    appKey: easybbs
+    appSecrcet: easybbs_key
+isDev: true
+admin:
+  email: 2664067940@qq.com
+  account: admin
+  password: admin123
+web:
+  api:
+    url: localhost:8080/api/innerApi/refresSysSetting
+logging:
+  level:
+    com.example.mybatis_plus.sys.mapper: debug
