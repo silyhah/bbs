@@ -13,15 +13,21 @@ spring:
     username: root
     password: password
   mail:
+    protocol: smtp
+    host: smtp.qq.com
+    port: 587
     username: 2664067940@qq.com
-    password: bvqulykzolhsdiad
-    port: 465
+    password: oydltrkutufheaca
+    test-connection: false
     properties:
       mail:
         debug: true
+        mine:
+          splitlongparameters: false
         smtp:
-          socketFactory:
-            class :javax.net.ssl.SSLSocketFactory
+          auth: false
+        default-encoding: UTF-8
+
 project:
   folder: D://untitled/bbs/
 inner:
