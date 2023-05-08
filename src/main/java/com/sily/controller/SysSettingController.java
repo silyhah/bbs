@@ -1,5 +1,8 @@
 package com.sily.controller;
 
+import com.sily.common.R;
+import com.sily.service.ISysSettingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,5 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class SysSettingController {
+
+    @Autowired
+    private ISysSettingService iSysSettingService;
+
+    /**
+     * 获取系统设置
+     * @return
+     */
+    @RequestMapping("/getSysSetting")
+    public R getSysSetting(){
+        return R.success(iSysSettingService.list());
+    }
 
 }

@@ -15,6 +15,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -84,6 +85,7 @@ public class UserInfoController {
             return R.error("密码错误");
         }
         session.removeAttribute(Constants.CHECK_CODE_KEY);
+        session.setAttribute(Constants.USER_ID,userInfo.getUserId());
         return R.success("登录成功");
     }
 
@@ -138,6 +140,16 @@ public class UserInfoController {
         return R.success("保存成功");
     }
 
+    /**
+     * 重置密码
+     * @param email
+     * @param emailCode
+     * @param password1
+     * @param password2
+     * @param checkCode
+     * @param session
+     * @return
+     */
     @RequestMapping("/resetPwd")
     public R resetPwd(String email, String emailCode, String password1, String password2, String checkCode, HttpSession session) {
         if (StringTools.isEmpty(email) || StringTools.isEmpty(emailCode) || StringTools.isEmpty(password1) || StringTools.isEmpty(password2) || StringTools.isEmpty(checkCode)) {
@@ -169,6 +181,33 @@ public class UserInfoController {
             return R.error("修改失败");
         }
         session.removeAttribute(Constants.CHECK_CODE_KEY);
+        session.removeAttribute(Constants.USER_ID);
         return R.success("重置密码成功");
     }
+
+    /**
+     * 获取用户信息
+     * @param session
+     * @return
+     */
+    @RequestMapping("/getUserInfo")
+    public R getUserInfo(HttpSession session){
+        String userId = (String) session.getAttribute(Constants.USER_ID);
+        LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UserInfo::getUserId,userId);
+        UserInfo user = iUserInfoService.getOne(queryWrapper);
+        return user==null ? R.error("获取信息失败") : R.success(user);
+    }
+
+    /**
+     * 退出登录
+     * @param session
+     * @return
+     */
+    @RequestMapping("/logout")
+    public R logout(HttpSession session){
+        session.removeAttribute(Constants.USER_ID);
+        return R.success("退出成功");
+    }
+
 }
