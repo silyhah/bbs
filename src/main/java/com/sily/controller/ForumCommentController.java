@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sily.Utils.StringTools;
 import com.sily.common.R;
+import com.sily.entity.ForumArticle;
 import com.sily.entity.ForumComment;
 import com.sily.entity.constants.Constants;
 import com.sily.service.IForumCommentService;
@@ -66,10 +67,36 @@ public class ForumCommentController {
         return R.success(forumComment);
     }
 
+    /**
+     * 评论点赞
+     * @param commentId
+     * @return
+     */
     @RequestMapping("/comment/doLike")
-    public R doLike(){
+    public R doLike(Integer commentId){
+        LambdaQueryWrapper<ForumComment> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ForumComment::getCommentId,commentId);
+        ForumComment comment = iForumCommentService.getOne(queryWrapper);
+        comment.setGoodCount(comment.getGoodCount()+1);
+        return R.success(comment);
+    }
 
-        return null;
+    /**
+     * 置顶/取消置顶
+     * @param commentId
+     * @return
+     */
+    @RequestMapping("/comment/changeTopTYpe")
+    public R changeTopType(Integer commentId){
+        LambdaQueryWrapper<ForumComment> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ForumComment::getCommentId,commentId);
+        ForumComment comment = iForumCommentService.getOne(queryWrapper);
+        if (comment.getTopType()==0) {
+            comment.setTopType(1);
+        } else {
+            comment.setTopType(0);
+        }
+        return R.success(comment);
     }
 
 

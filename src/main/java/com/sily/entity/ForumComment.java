@@ -225,4 +225,5 @@ public class ForumComment implements Serializable {
         ", status=" + status +
         "}";
     }
+
 }
