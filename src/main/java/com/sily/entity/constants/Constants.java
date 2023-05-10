@@ -12,13 +12,12 @@ public class Constants {
     public static final String FILE_FOLDER = "/file";
     public static final String FILE_FOLDER_TEMP = "/temp/";
     public static final String FILE_FOLDER_TEMP_2 = "temp";
+    public static final String FILE_FOLDER_IMAGE = "/images";
+    public static final String FILE_FOLDER_AVATAR = "avatar";
+    public static final String FILE_AVATAR_SUFFIX = ".jpg";
+    public static final String FILE_AVATAR_DEFAULT = "default_avatar.jpg";
 
 
-
-
-
-
-
-    public static final String[] IMAGE_SUFFIX = {".jpg"};
+    public static final String[] IMAGE_SUFFIX = {".jpg",".xbm",".tif","pjp",".svgz","jpg","jpeg","ico","tiff",".gif","svg",".jfif",".webp",".png",".bmp","pjpeg",".avif"};
 
 }
