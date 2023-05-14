@@ -53,4 +53,5 @@ public class SysSetting implements Serializable {
         ", jsonContent=" + jsonContent +
         "}";
     }
+
 }

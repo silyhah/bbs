@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sily.Utils.StringTools;
 import com.sily.common.R;
+import com.sily.entity.ForumArticle;
 import com.sily.entity.UserInfo;
 import com.sily.entity.UserIntegralRecord;
 import com.sily.entity.constants.Constants;
+import com.sily.service.IForumArticleService;
 import com.sily.service.IUserInfoService;
 import com.sily.service.IUserIntegralRecordService;
 import com.sily.service.IUserMessageService;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -38,6 +41,9 @@ public class UCenterController {
 
     @Autowired
     private IUserMessageService iUserMessageService;
+
+    @Autowired
+    private IForumArticleService iForumArticleService;
 
     /**
      * 获取用户信息
@@ -97,8 +103,36 @@ public class UCenterController {
         return R.success(one);
     }
 
+    /**
+     * 获取用户发帖
+     * @param userId
+     * @param type
+     * @return
+     */
     @RequestMapping("/loadUserArticle")
     public R loadUserArticle(Integer userId, Integer type){
+        Page<ForumArticle> page = new Page<>(1,15);
+        LambdaQueryWrapper<ForumArticle> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ForumArticle::getUserId,userId);
+        return R.success(iForumArticleService.page(page,queryWrapper));
+    }
+
+    /**
+     * 获取用户消息数
+     * @param session
+     * @return
+     */
+    @RequestMapping("/getMessageCount")
+    public R getMessageCount(HttpSession session){
+        String userId = (String) session.getAttribute(Constants.USER_ID);
+        LambdaQueryWrapper<ForumArticle> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ForumArticle::getUserId, userId);
+        List<ForumArticle> list = iForumArticleService.list(queryWrapper);
+        return R.success(list.size());
+    }
+
+    @RequestMapping("/loadMessageList")
+    public R loadMessageMessageList(String code, Integer pageNo){
         return null;
     }
 
