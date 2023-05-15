@@ -1,17 +1,23 @@
 package com.sily.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.sily.Utils.JsonUtils;
 import com.sily.Utils.StringTools;
 import com.sily.Utils.SysCacheUtils;
 import com.sily.entity.SysSetting;
 import com.sily.entity.dto.SysSettingDto;
 import com.sily.entity.enums.SysSettingEnum;
+import com.sily.mapper.SysSettingDtoMapper;
 import com.sily.mapper.SysSettingMapper;
 import com.sily.service.ISysSettingService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.sily.service.SysSettingDtoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -28,8 +34,10 @@ import java.util.List;
 public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSetting> implements ISysSettingService {
 
 
-    @Autowired
+    @Resource
     private ISysSettingService iSysSettingService;
+
+    private static final Logger logger = LoggerFactory.getLogger(SysSettingServiceImpl.class);
 
     @Override
     public void refresh() {
@@ -43,7 +51,7 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
                 }
                 String code = sysSetting.getCode();
                 SysSettingEnum sysSettingEnum = SysSettingEnum.getByCode(code);
-                PropertyDescriptor pd = new PropertyDescriptor(sysSettingEnum.getPropName(), SysSetting.class);
+                PropertyDescriptor pd = new PropertyDescriptor(sysSettingEnum.getPropName(), SysSettingDto.class);
                 Method method = pd.getWriteMethod();
                 Class subClass = Class.forName(sysSettingEnum.gettClass());
                 method.invoke(sysSettingDto, JsonUtils.convertJson2Obj(jsonContent, subClass));
@@ -52,7 +60,7 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("刷新缓存失败");
 
         }
     }

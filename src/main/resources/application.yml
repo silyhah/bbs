@@ -12,6 +12,8 @@ spring:
     url: jdbc:mysql://192.168.231.128:3306/rain?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: password
+  main:
+    allow-circular-references: true
   mail:
     protocol: smtp
     host: smtp.qq.com
@@ -45,3 +47,4 @@ web:
 logging:
   level:
     com.example.mybatis_plus.sys.mapper: debug
+

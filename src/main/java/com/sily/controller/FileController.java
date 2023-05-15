@@ -1,6 +1,7 @@
 package com.sily.controller;
 
 import com.sily.Utils.StringTools;
+import com.sily.annoation.GlobalInterceptor;
 import com.sily.common.BusinessException;
 import com.sily.common.R;
 import com.sily.entity.constants.Constants;
