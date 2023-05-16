@@ -8,6 +8,8 @@ public class Constants {
 
     public static final Integer LENGTH_30 = 30;
 
+    public static final Integer STATUS_0 = 0;
+
 
     public static final String FILE_FOLDER = "/file";
     public static final String FILE_FOLDER_TEMP = "/temp/";

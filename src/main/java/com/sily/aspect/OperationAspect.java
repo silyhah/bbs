@@ -48,10 +48,19 @@ public class OperationAspect {
             if (interceptor.checkParam()) {
                 validateParas(method, args);
             }
-        } catch (Exception e) {
-            logger.error("错误");
+            Object pointResult = point.proceed();
+            return pointResult;
+        }catch (BusinessException e){
+            logger.error("全局拦截器错误",e);
+            throw e;
         }
-        return null;
+        catch (Exception e) {
+            logger.error("全局拦截器错误",e);
+            throw new BusinessException("500");
+        } catch (Throwable e) {
+            logger.error("全局拦截器错误",e);
+            throw new BusinessException("500");
+        }
     }
 
     private void validateParas(Method method, Object[] arguments) {

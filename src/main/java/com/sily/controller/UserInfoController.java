@@ -2,23 +2,29 @@ package com.sily.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.sily.Utils.StringTools;
+import com.sily.annoation.GlobalInterceptor;
+import com.sily.annoation.VerifyParam;
+import com.sily.common.BusinessException;
 import com.sily.common.CreateImageCode;
 import com.sily.common.R;
 import com.sily.entity.UserInfo;
 import com.sily.entity.constants.Constants;
+import com.sily.entity.enums.VerifyRegexEnum;
 import com.sily.service.IUserInfoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.object.UpdatableSqlQuery;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.time.LocalDateTime;
+
 
 /**
  * <p>
@@ -30,6 +36,8 @@ import java.io.IOException;
  */
 @RestController
 public class UserInfoController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserInfoController.class);
 
     @Autowired
     private IUserInfoService iUserInfoService;
@@ -69,23 +77,23 @@ public class UserInfoController {
      */
     @RequestMapping("/login")
     public R login(String email, String password, String checkCode, HttpSession session) {
-        if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))) {
+        UserInfo userInfo;
+        try {
+            if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))) {
+                throw new BusinessException("图片验证码错误");
+            }
+            LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(UserInfo::getEmail, email);
+            userInfo = iUserInfoService.getOne(queryWrapper);
+            if (userInfo == null||!password.equals(userInfo.getPassword())) {
+                throw new BusinessException("用户名或者密码错误");
+            }
+            if (userInfo.getStatus().equals(Constants.STATUS_0)){
+                throw new BusinessException("账号被禁用");
+            }
+        } finally {
             session.removeAttribute(Constants.CHECK_CODE_KEY);
-            return R.error("验证码错误，请重新登录");
         }
-        LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(UserInfo::getEmail, email);
-        UserInfo userInfo = iUserInfoService.getOne(queryWrapper);
-        if (userInfo == null) {
-            session.removeAttribute(Constants.CHECK_CODE_KEY);
-            return R.error("没有这个用户");
-        }
-        if (!password.equals(userInfo.getPassword())) {
-            session.removeAttribute(Constants.CHECK_CODE_KEY);
-            return R.error("密码错误");
-        }
-        session.removeAttribute(Constants.CHECK_CODE_KEY);
-        session.setAttribute(Constants.USER_ID,userInfo.getUserId());
         return R.success("登录成功");
     }
 
@@ -120,24 +128,32 @@ public class UserInfoController {
     }
 
     @PostMapping("/register")
-    public R register(HttpSession session, String email, String nickName, String password, String emailCode, String checkCode) {
-        if (StringTools.isEmpty(email) || StringTools.isEmpty(nickName) || StringTools.isEmpty(password) || StringTools.isEmpty(emailCode) || StringTools.isEmpty(checkCode)) {
-            return R.error("有空参数");
+    @GlobalInterceptor
+    public R register(HttpSession session,
+                      @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL) String email,
+                      @VerifyParam(required = true,regex = VerifyRegexEnum.NUMBER_LETTER_UNDER_LINE) String nickName,
+                      @VerifyParam(required = true,regex = VerifyRegexEnum.PASSWORD) String password,
+                      @VerifyParam(required = true,regex = VerifyRegexEnum.PASSWORD) String emailCode,
+                      @VerifyParam(required = true,regex = VerifyRegexEnum.PASSWORD) String checkCode) {
+        try {
+            if (!emailCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY_EMAIL))) {
+                return R.error("邮箱验证码错误");
+            }
+            if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))) {
+                return R.error("图片验证码错误");
+            }
+            UserInfo userInfo = new UserInfo();
+            userInfo.setEmail(email);
+            userInfo.setNickName(nickName);
+            userInfo.setPassword(password);
+            userInfo.setLastLoginTime(LocalDateTime.now());
+            userInfo.setStatus(1);
+            userInfo.setJoinTime(LocalDateTime.now());
+        } catch (Exception e) {
+            logger.error("注册失败",e);
+            throw new BusinessException("注册失败");
         }
-        if (!emailCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY_EMAIL))) {
-            return R.error("邮箱验证码错误");
-        }
-        if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))) {
-            return R.error("图片验证码错误");
-        }
-        UserInfo userInfo = new UserInfo();
-        userInfo.setEmail(email);
-        userInfo.setNickName(nickName);
-        userInfo.setPassword(DigestUtils.md5DigestAsHex(password.getBytes()));
-        if (!iUserInfoService.save(userInfo)) {
-            return R.error("保存失败");
-        }
-        return R.success("保存成功");
+        throw new BusinessException("注册失败");
     }
 
     /**
