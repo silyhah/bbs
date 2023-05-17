@@ -6,7 +6,6 @@ import com.sily.Utils.VerifyUtils;
 import com.sily.annoation.GlobalInterceptor;
 import com.sily.annoation.VerifyParam;
 import com.sily.common.BusinessException;
-import com.sily.entity.enums.VerifyRegexEnum;
 import org.apache.commons.lang3.ArrayUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -76,9 +75,8 @@ public class OperationAspect {
 
             if (ArrayUtils.contains(TYPE_BASE, parameter.getParameterizedType().getTypeName())) {
                 checkValue(value,verifyParam);
-            } else {
-
             }
+
 
         }
     }

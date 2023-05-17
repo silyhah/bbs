@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * <p>
@@ -57,6 +58,31 @@ public class ForumBoard implements Serializable {
      * 0:只允许管理员发帖 1:任何人可以发帖
      */
     private Boolean postType;
+
+    @TableField(exist = false)
+    private List<ForumBoard> children;
+
+    @Override
+    public String toString() {
+        return "ForumBoard{" +
+                "boardId=" + boardId +
+                ", pBoardId=" + pBoardId +
+                ", boardName='" + boardName + '\'' +
+                ", cover='" + cover + '\'' +
+                ", boardDesc='" + boardDesc + '\'' +
+                ", sort=" + sort +
+                ", postType=" + postType +
+                ", children=" + children +
+                '}';
+    }
+
+    public List<ForumBoard> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<ForumBoard> children) {
+        this.children = children;
+    }
 
 
     public Integer getBoardId() {
@@ -115,16 +141,4 @@ public class ForumBoard implements Serializable {
         this.postType = postType;
     }
 
-    @Override
-    public String toString() {
-        return "ForumBoard{" +
-        "boardId=" + boardId +
-        ", pBoardId=" + pBoardId +
-        ", boardName=" + boardName +
-        ", cover=" + cover +
-        ", boardDesc=" + boardDesc +
-        ", sort=" + sort +
-        ", postType=" + postType +
-        "}";
-    }
 }

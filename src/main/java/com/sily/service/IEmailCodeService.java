@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IEmailCodeService extends IService<EmailCode> {
 
+    void checkCode(String email, String emailCode);
+
 }

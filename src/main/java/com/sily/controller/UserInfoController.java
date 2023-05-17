@@ -1,7 +1,6 @@
 package com.sily.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.sily.Utils.StringTools;
 import com.sily.annoation.GlobalInterceptor;
 import com.sily.annoation.VerifyParam;
 import com.sily.common.BusinessException;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -107,10 +105,11 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping("/sendEmailCode")
-    public R sendEmailCode(HttpSession session, String email, String checkCode, Integer type) {
-        if (StringTools.isEmpty(email) || StringTools.isEmpty(checkCode) || type == null) {
-            return R.error("未填写全部");
-        }
+    @GlobalInterceptor(checkParam = true)
+    public R sendEmailCode(HttpSession session,
+                           @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL) String email,
+                           @VerifyParam(required = true) String checkCode,
+                           @VerifyParam(required = true) Integer type) {
         try {
             String emailCode = new CreateImageCode().getCode();
             session.setAttribute(Constants.CHECK_CODE_KEY_EMAIL, emailCode);
@@ -127,6 +126,16 @@ public class UserInfoController {
         return R.error("发送失败");
     }
 
+    /**
+     * 注册
+     * @param session
+     * @param email
+     * @param nickName
+     * @param password
+     * @param emailCode
+     * @param checkCode
+     * @return
+     */
     @PostMapping("/register")
     @GlobalInterceptor
     public R register(HttpSession session,
@@ -160,45 +169,29 @@ public class UserInfoController {
      * 重置密码
      * @param email
      * @param emailCode
-     * @param password1
-     * @param password2
+     * @param password
      * @param checkCode
      * @param session
      * @return
      */
     @RequestMapping("/resetPwd")
-    public R resetPwd(String email, String emailCode, String password1, String password2, String checkCode, HttpSession session) {
-        if (StringTools.isEmpty(email) || StringTools.isEmpty(emailCode) || StringTools.isEmpty(password1) || StringTools.isEmpty(password2) || StringTools.isEmpty(checkCode)) {
+    @GlobalInterceptor(checkParam = true)
+    public R resetPwd(HttpSession session,
+                      @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL) String email,
+                      @VerifyParam(required = true) String emailCode,
+                      @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String password,
+                      @VerifyParam(required = true) String checkCode) {
+        try {
+            if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))) {
+                session.removeAttribute(Constants.CHECK_CODE_KEY);
+                return R.error("图片验证码错误");
+            }
+            iUserInfoService.resetPwd(email,password,emailCode);
+
+        } finally {
             session.removeAttribute(Constants.CHECK_CODE_KEY);
-            return R.error("有数据为空");
         }
-        if (!password1.equals(password2)) {
-            session.removeAttribute(Constants.CHECK_CODE_KEY);
-            return R.error("两次密码不一致");
-        }
-        if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))) {
-            session.removeAttribute(Constants.CHECK_CODE_KEY);
-            return R.error("图片验证码错误");
-        }
-        LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(UserInfo::getEmail, email);
-        UserInfo userInfo = iUserInfoService.getOne(queryWrapper);
-        if (userInfo == null) {
-            session.removeAttribute(Constants.CHECK_CODE_KEY);
-            return R.error("不存在这个用户");
-        }
-        if (!DigestUtils.md5DigestAsHex(password1.getBytes()).equals(userInfo.getPassword())) {
-            session.removeAttribute(Constants.CHECK_CODE_KEY);
-            return R.error("密码错误");
-        }
-        userInfo.setPassword(password1);
-        if (!iUserInfoService.updateById(userInfo)) {
-            session.removeAttribute(Constants.CHECK_CODE_KEY);
-            return R.error("修改失败");
-        }
-        session.removeAttribute(Constants.CHECK_CODE_KEY);
-        session.removeAttribute(Constants.USER_ID);
-        return R.success("重置密码成功");
+        return R.success(null);
     }
 
     /**

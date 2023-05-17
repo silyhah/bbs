@@ -3,6 +3,7 @@ package com.sily.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.sily.common.R;
 import com.sily.entity.ForumBoard;
+import com.sily.entity.constants.Constants;
 import com.sily.service.IForumBoardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +33,7 @@ public class ForumBoardController {
      */
     @GetMapping("/board/loadBoard")
     public R listAll() {
-        LambdaQueryWrapper<ForumBoard> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.orderByAsc(ForumBoard::getBoardId);
-        List<ForumBoard> boards = iForumBoardService.list(queryWrapper);
-        log.info("获取所有板块成功");
-        return R.success(boards);
+        return R.success(iForumBoardService.getBoardTree(Constants.P_BOARD_ID));
     }
 
     /**
@@ -47,10 +44,7 @@ public class ForumBoardController {
      */
     @PostMapping("/board/saveBoard")
     public R save(@RequestBody ForumBoard forumBoard) {
-        log.info("保存模块");
-        log.info(forumBoard.toString());
         return iForumBoardService.save(forumBoard) ? R.success("保存成功") : R.success("保存失败");
-
     }
 
     /**
