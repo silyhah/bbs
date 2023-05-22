@@ -1,10 +1,12 @@
 package com.sily.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -126,9 +128,36 @@ public class ForumArticle implements Serializable {
     private Integer attachmentType;
 
     /**
-     * -1已删除 0:待审核  1:已审核 
+     * -1已删除 0:待审核  1:已审核
      */
     private Integer status;
+
+
+    public ForumArticle(String articleId, Integer boardId, String boardName, Integer pBoardId, String pBoardName, String userId, String nickName, String userIpAddress, String title, String cover, String content, String markdownContent, Integer editorType, String summary, LocalDateTime postTime, LocalDateTime lastUpdateTime, Integer readCount, Integer goodCount, Integer commentCount, Integer topType, Integer attachmentType, Integer status) {
+        this.articleId = articleId;
+        this.boardId = boardId;
+        this.boardName = boardName;
+        this.pBoardId = pBoardId;
+        this.pBoardName = pBoardName;
+        this.userId = userId;
+        this.nickName = nickName;
+        this.userIpAddress = userIpAddress;
+        this.title = title;
+        this.cover = cover;
+        this.content = content;
+        this.markdownContent = markdownContent;
+        this.editorType = editorType;
+        this.summary = summary;
+        this.postTime = postTime;
+        this.lastUpdateTime = lastUpdateTime;
+        this.readCount = readCount;
+        this.goodCount = goodCount;
+        this.commentCount = commentCount;
+        this.topType = topType;
+        this.attachmentType = attachmentType;
+        this.status = status;
+    }
+
 
 
     public String getArticleId() {

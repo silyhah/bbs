@@ -2,6 +2,8 @@ package com.sily.entity.constants;
 
 public class Constants {
 
+    public static final Integer ONE = 0;
+
     public static final String CHECK_CODE_KEY = "check_code_key";
     public static final String CHECK_CODE_KEY_EMAIL = "check_code_key_email";
     public static final String USER_ID = "user_id";
@@ -9,6 +11,7 @@ public class Constants {
     public static final Integer LENGTH_30 = 30;
 
     public static final Integer STATUS_0 = 0;
+
 
 
     public static final Integer P_BOARD_ID = 0;

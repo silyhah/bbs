@@ -47,4 +47,7 @@ web:
 logging:
   level:
     com.example.mybatis_plus.sys.mapper: debug
+mybatis:
+  mapper-locations: classpath*:mybatis.mapper/*.xml
+
 

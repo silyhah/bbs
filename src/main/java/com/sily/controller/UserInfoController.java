@@ -74,15 +74,17 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping("/login")
-    public R login(String email, String password, String checkCode, HttpSession session) {
-        UserInfo userInfo;
+    public R login(HttpSession session,
+                   @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL) String email,
+                   @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String password,
+                   @VerifyParam(required = true) String checkCode) {
         try {
             if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))) {
                 throw new BusinessException("图片验证码错误");
             }
             LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(UserInfo::getEmail, email);
-            userInfo = iUserInfoService.getOne(queryWrapper);
+            UserInfo userInfo = iUserInfoService.getOne(queryWrapper);
             if (userInfo == null||!password.equals(userInfo.getPassword())) {
                 throw new BusinessException("用户名或者密码错误");
             }

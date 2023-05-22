@@ -36,6 +36,7 @@ public class ForumBoardServiceImpl extends ServiceImpl<ForumBoardMapper, ForumBo
         return convertList2Tree(list, Constants.P_BOARD_ID);
     }
 
+
     private List<ForumBoard> convertList2Tree(List<ForumBoard> boardList, Integer pid){
         List<ForumBoard> children = new ArrayList<>();
         for (ForumBoard fb : boardList){

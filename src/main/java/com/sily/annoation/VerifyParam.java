@@ -17,6 +17,8 @@ public @interface VerifyParam {
 
     int min() default -1;
 
+
+
     VerifyRegexEnum regex() default VerifyRegexEnum.NO;
 
 

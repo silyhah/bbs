@@ -8,6 +8,7 @@ public enum VerifyRegexEnum {
     NUMBER_LETTER_UNDER_LINE("^[\\u4E00-\\u9FA5A-Za-z0-9_]+$","数字，字母，中文，下划线"),
     EMAIL("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$","邮箱"),
     PHONE("/^\\d{3}-\\d{8}$|^\\d{4}-\\d{7}$/","电话"),
+    NUMBER_LETTER("^[A-Za-z0-9]+$","数字，字母"),
     PASSWORD("^\\w+$ 或 ^\\w{3,20}$","数字，字母，下划线");
 
 

@@ -17,4 +17,5 @@ public interface IForumBoardService extends IService<ForumBoard> {
 
     List<ForumBoard> getBoardTree(Integer postType);
 
+
 }
