@@ -8,7 +8,9 @@ import com.sily.common.CreateImageCode;
 import com.sily.common.R;
 import com.sily.entity.UserInfo;
 import com.sily.entity.constants.Constants;
+import com.sily.entity.enums.CheckCodeTypeEnum;
 import com.sily.entity.enums.VerifyRegexEnum;
+import com.sily.service.IEmailCodeService;
 import com.sily.service.IUserInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,9 @@ public class UserInfoController {
     @Autowired
     private JavaMailSender mailSender;
 
+    @Autowired
+    private IEmailCodeService iEmailCodeService;
+
 
     /**
      * 获取验证码
@@ -53,14 +58,20 @@ public class UserInfoController {
      * @throws IOException
      */
     @RequestMapping("/checkCode")
-    public void checkCode(HttpServletResponse response, HttpSession session, Integer type, Long time) throws IOException {
+    public void checkCode(HttpServletResponse response, HttpSession session,
+                          @RequestParam Integer type,
+                          @RequestParam(required = false) Long time) throws IOException {
         CreateImageCode vCode = new CreateImageCode(130, 38, 5, 10);
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache");
         response.setDateHeader("Expires", 0);
         response.setContentType("image/jpeg");
-        String checkCode = vCode.getCode();
-        session.setAttribute(Constants.CHECK_CODE_KEY, checkCode);
+        String code = vCode.getCode();
+        if (CheckCodeTypeEnum.CHECK_CODE_0.getType().equals(type)){
+            session.setAttribute(Constants.CHECK_CODE_KEY,code);
+        }else {
+            session.setAttribute(Constants.CHECK_CODE_KEY_EMAIL,code);
+        }
         vCode.write(response.getOutputStream());
     }
 
@@ -74,6 +85,7 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping("/login")
+    @GlobalInterceptor(checkParam = true)
     public R login(HttpSession session,
                    @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL) String email,
                    @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String password,
@@ -107,25 +119,12 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping("/sendEmailCode")
-    @GlobalInterceptor(checkParam = true)
     public R sendEmailCode(HttpSession session,
                            @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL) String email,
                            @VerifyParam(required = true) String checkCode,
                            @VerifyParam(required = true) Integer type) {
-        try {
-            String emailCode = new CreateImageCode().getCode();
-            session.setAttribute(Constants.CHECK_CODE_KEY_EMAIL, emailCode);
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("2664067940@qq.com");
-            message.setTo(email);
-            message.setSubject("邮箱验证码--bbs");
-            message.setText("你的邮箱验证码是：" + emailCode);
-            mailSender.send(message);
-            return R.success("发送成功");
-        } catch (MailException e) {
-            e.printStackTrace();
-        }
-        return R.error("发送失败");
+        iEmailCodeService.sendEmailCode(email,type);
+        return R.success("发送成功");
     }
 
     /**

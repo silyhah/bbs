@@ -2,6 +2,7 @@ package com.sily.service;
 
 import com.sily.entity.SysSetting;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.sily.entity.dto.SysSettingDto;
 
 /**
  * <p>
@@ -14,4 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ISysSettingService extends IService<SysSetting> {
 
     void refresh();
+
+    SysSettingDto getSysSettingDto();
 }

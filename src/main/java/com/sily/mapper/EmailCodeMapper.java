@@ -3,6 +3,7 @@ package com.sily.mapper;
 import com.sily.entity.EmailCode;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -15,4 +16,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface EmailCodeMapper extends BaseMapper<EmailCode> {
 
+
+    void disableEmailCode(@Param("email")String email);
 }

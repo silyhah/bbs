@@ -5,63 +5,63 @@ import lombok.Data;
 @Data
 public class SysSettingDto {
 
-    private SysSetting4AuditDto sysSetting4AuditDto;
+    private SysSetting4AuditDto auditSetting;
 
-    private SysSetting4CommentDto sysSetting4CommentDto;
+    private SysSetting4CommentDto commentSetting;
 
-    private SysSetting4EmailDto sysSetting4EmailDto;
+    private SysSetting4EmailDto emailSetting;
 
-    private SysSetting4LikeDto sysSetting4LikeDto;
+    private SysSetting4LikeDto likeSetting;
 
-    private SysSetting4PostDto sysSetting4PostDto;
+    private SysSetting4PostDto postSetting;
 
-    private SysSetting4RegisterDto sysSetting4RegisterDto;
+    private SysSetting4RegisterDto registerSetting;
 
-    public SysSetting4AuditDto getSysSetting4AuditDto() {
-        return sysSetting4AuditDto;
+    public SysSetting4AuditDto getAuditSetting() {
+        return auditSetting;
     }
 
-    public void setSysSetting4AuditDto(SysSetting4AuditDto sysSetting4AuditDto) {
-        this.sysSetting4AuditDto = sysSetting4AuditDto;
+    public void setAuditSetting(SysSetting4AuditDto auditSetting) {
+        this.auditSetting = auditSetting;
     }
 
-    public SysSetting4CommentDto getSysSetting4CommentDto() {
-        return sysSetting4CommentDto;
+    public SysSetting4CommentDto getCommentSetting() {
+        return commentSetting;
     }
 
-    public void setSysSetting4CommentDto(SysSetting4CommentDto sysSetting4CommentDto) {
-        this.sysSetting4CommentDto = sysSetting4CommentDto;
+    public void setCommentSetting(SysSetting4CommentDto commentSetting) {
+        this.commentSetting = commentSetting;
     }
 
-    public SysSetting4EmailDto getSysSetting4EmailDto() {
-        return sysSetting4EmailDto;
+    public SysSetting4EmailDto getEmailSetting() {
+        return emailSetting;
     }
 
-    public void setSysSetting4EmailDto(SysSetting4EmailDto sysSetting4EmailDto) {
-        this.sysSetting4EmailDto = sysSetting4EmailDto;
+    public void setEmailSetting(SysSetting4EmailDto emailSetting) {
+        this.emailSetting = emailSetting;
     }
 
-    public SysSetting4LikeDto getSysSetting4LikeDto() {
-        return sysSetting4LikeDto;
+    public SysSetting4LikeDto getLikeSetting() {
+        return likeSetting;
     }
 
-    public void setSysSetting4LikeDto(SysSetting4LikeDto sysSetting4LikeDto) {
-        this.sysSetting4LikeDto = sysSetting4LikeDto;
+    public void setLikeSetting(SysSetting4LikeDto likeSetting) {
+        this.likeSetting = likeSetting;
     }
 
-    public SysSetting4PostDto getSysSetting4PostDto() {
-        return sysSetting4PostDto;
+    public SysSetting4PostDto getPostSetting() {
+        return postSetting;
     }
 
-    public void setSysSetting4PostDto(SysSetting4PostDto sysSetting4PostDto) {
-        this.sysSetting4PostDto = sysSetting4PostDto;
+    public void setPostSetting(SysSetting4PostDto postSetting) {
+        this.postSetting = postSetting;
     }
 
-    public SysSetting4RegisterDto getSysSetting4RegisterDto() {
-        return sysSetting4RegisterDto;
+    public SysSetting4RegisterDto getRegisterSetting() {
+        return registerSetting;
     }
 
-    public void setSysSetting4RegisterDto(SysSetting4RegisterDto sysSetting4RegisterDto) {
-        this.sysSetting4RegisterDto = sysSetting4RegisterDto;
+    public void setRegisterSetting(SysSetting4RegisterDto registerSetting) {
+        this.registerSetting = registerSetting;
     }
 }

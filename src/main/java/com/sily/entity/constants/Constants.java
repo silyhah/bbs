@@ -2,7 +2,9 @@ package com.sily.entity.constants;
 
 public class Constants {
 
-    public static final Integer ONE = 0;
+    public static final Integer ZERO = 0;
+    public static final Integer ONE = 1;
+    public static final Integer FIVE = 5;
 
     public static final String CHECK_CODE_KEY = "check_code_key";
     public static final String CHECK_CODE_KEY_EMAIL = "check_code_key_email";
