@@ -119,10 +119,14 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping("/sendEmailCode")
+    @GlobalInterceptor
     public R sendEmailCode(HttpSession session,
                            @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL) String email,
                            @VerifyParam(required = true) String checkCode,
                            @VerifyParam(required = true) Integer type) {
+        if (!checkCode.equals(session.getAttribute(Constants.CHECK_CODE_KEY))){
+            throw new BusinessException("验证码错误");
+        }
         iEmailCodeService.sendEmailCode(email,type);
         return R.success("发送成功");
     }

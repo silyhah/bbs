@@ -74,14 +74,18 @@ public class EmailCodeServiceImpl extends ServiceImpl<EmailCodeMapper, EmailCode
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void sendEmailCode(String email, Integer type) {
-        /*if (EmailCodeEnum.EMAIL_CODE_0.getType().equals(type)) {
-            LambdaQueryWrapper<EmailCode> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(EmailCode::getEmail,email);
-            EmailCode one = iEmailCodeService.getOne(queryWrapper);
+        LambdaQueryWrapper<EmailCode> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(EmailCode::getEmail,email);
+        EmailCode one = iEmailCodeService.getOne(queryWrapper);
+        if (EmailCodeEnum.EMAIL_CODE_0.getType().equals(type)) {
             if(one!=null){
                 throw new BusinessException("用户已存在");
             }
-        }*/
+        }else{
+            if (one==null){
+                throw new BusinessException("用户不存在");
+            }
+        }
         String code = StringTools.getRandomString(Constants.FIVE);
         sendEmail(email,code);
         emailCodeMapper.disableEmailCode(email);
