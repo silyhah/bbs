@@ -16,5 +16,4 @@ public interface ISysSettingService extends IService<SysSetting> {
 
     void refresh();
 
-    SysSettingDto getSysSettingDto();
 }

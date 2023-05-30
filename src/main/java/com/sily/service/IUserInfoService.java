@@ -15,4 +15,7 @@ public interface IUserInfoService extends IService<UserInfo> {
 
     void resetPwd(String email, String password, String emailCode);
 
+
+    void register(String email,String nickName, String password,String emailCode);
+
 }

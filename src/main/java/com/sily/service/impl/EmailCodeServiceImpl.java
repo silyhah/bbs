@@ -2,6 +2,7 @@ package com.sily.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.sily.Utils.StringTools;
+import com.sily.Utils.SysCacheUtils;
 import com.sily.common.BusinessException;
 import com.sily.config.WebConfig;
 import com.sily.entity.EmailCode;
@@ -49,9 +50,6 @@ public class EmailCodeServiceImpl extends ServiceImpl<EmailCodeMapper, EmailCode
 
     @Autowired
     private EmailCodeMapper emailCodeMapper;
-
-    @Autowired
-    private ISysSettingService iSysSettingService;
 
     private static final Logger logger = LoggerFactory.getLogger(EmailCodeServiceImpl.class);
 
@@ -106,7 +104,7 @@ public class EmailCodeServiceImpl extends ServiceImpl<EmailCodeMapper, EmailCode
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(webMvcConfig.getSendUserName());
             message.setTo(toEmail);
-            SysSettingDto sysSettingDto = iSysSettingService.getSysSettingDto();
+            SysSettingDto sysSettingDto = SysCacheUtils.getSysSetting();
             String emailTitle = sysSettingDto.getEmailSetting().getEmailTitle();
             message.setSubject(emailTitle);
             String emailContent = sysSettingDto.getEmailSetting().getEmailContent();

@@ -60,26 +60,4 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
         }
     }
 
-    public SysSettingDto getSysSettingDto() {
-        try {
-            SysSettingDto sysSettingDto = new SysSettingDto();
-            List<SysSetting> list = this.iSysSettingService.list();
-            for (SysSetting sysSetting : list) {
-                String jsonContent = sysSetting.getJsonContent();
-                if (StringTools.isEmpty(jsonContent)) {
-                    continue;
-                }
-                String code = sysSetting.getCode();
-                SysSettingEnum sysSettingEnum = SysSettingEnum.getByCode(code);
-                PropertyDescriptor pd = new PropertyDescriptor(sysSettingEnum.getPropName(), SysSettingDto.class);
-                Method method = pd.getWriteMethod();
-                Class subClass = Class.forName(sysSettingEnum.gettClass());
-                method.invoke(sysSettingDto, JsonUtils.convertJson2Obj(jsonContent, subClass));
-            }
-            return sysSettingDto;
-        } catch (Exception e) {
-            logger.error("获取失败",e);
-        }
-        return null;
-    }
 }

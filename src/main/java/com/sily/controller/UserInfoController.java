@@ -67,10 +67,10 @@ public class UserInfoController {
         response.setDateHeader("Expires", 0);
         response.setContentType("image/jpeg");
         String code = vCode.getCode();
-        if (CheckCodeTypeEnum.CHECK_CODE_0.getType().equals(type)){
-            session.setAttribute(Constants.CHECK_CODE_KEY,code);
-        }else {
-            session.setAttribute(Constants.CHECK_CODE_KEY_EMAIL,code);
+        if (CheckCodeTypeEnum.CHECK_CODE_0.getType().equals(type)) {
+            session.setAttribute(Constants.CHECK_CODE_KEY, code);
+        } else {
+            session.setAttribute(Constants.CHECK_CODE_KEY_EMAIL, code);
         }
         vCode.write(response.getOutputStream());
     }
@@ -97,10 +97,10 @@ public class UserInfoController {
             LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(UserInfo::getEmail, email);
             UserInfo userInfo = iUserInfoService.getOne(queryWrapper);
-            if (userInfo == null||!password.equals(userInfo.getPassword())) {
+            if (userInfo == null || !password.equals(userInfo.getPassword())) {
                 throw new BusinessException("用户名或者密码错误");
             }
-            if (userInfo.getStatus().equals(Constants.STATUS_0)){
+            if (userInfo.getStatus().equals(Constants.STATUS_0)) {
                 throw new BusinessException("账号被禁用");
             }
         } finally {
@@ -124,15 +124,16 @@ public class UserInfoController {
                            @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL) String email,
                            @VerifyParam(required = true) String checkCode,
                            @VerifyParam(required = true) Integer type) {
-        if (!checkCode.equals(session.getAttribute(Constants.CHECK_CODE_KEY))){
+        if (!checkCode.equals(session.getAttribute(Constants.CHECK_CODE_KEY))) {
             throw new BusinessException("验证码错误");
         }
-        iEmailCodeService.sendEmailCode(email,type);
+        iEmailCodeService.sendEmailCode(email, type);
         return R.success("发送成功");
     }
 
     /**
      * 注册
+     *
      * @param session
      * @param email
      * @param nickName
@@ -142,29 +143,21 @@ public class UserInfoController {
      * @return
      */
     @PostMapping("/register")
-    @GlobalInterceptor
+    @GlobalInterceptor(checkParam = true)
     public R register(HttpSession session,
                       @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL) String email,
-                      @VerifyParam(required = true,regex = VerifyRegexEnum.NUMBER_LETTER_UNDER_LINE) String nickName,
-                      @VerifyParam(required = true,regex = VerifyRegexEnum.PASSWORD) String password,
-                      @VerifyParam(required = true,regex = VerifyRegexEnum.PASSWORD) String emailCode,
-                      @VerifyParam(required = true,regex = VerifyRegexEnum.PASSWORD) String checkCode) {
+                      @VerifyParam(required = true, regex = VerifyRegexEnum.NUMBER_LETTER_UNDER_LINE) String nickName,
+                      @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String password,
+                      @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String emailCode,
+                      @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String checkCode) {
         try {
-            if (!emailCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY_EMAIL))) {
-                return R.error("邮箱验证码错误");
+            if (!session.getAttribute(Constants.CHECK_CODE_KEY).equals(checkCode))
+            {
+                throw new BusinessException("图片验证码错误");
             }
-            if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))) {
-                return R.error("图片验证码错误");
-            }
-            UserInfo userInfo = new UserInfo();
-            userInfo.setEmail(email);
-            userInfo.setNickName(nickName);
-            userInfo.setPassword(password);
-            userInfo.setLastLoginTime(LocalDateTime.now());
-            userInfo.setStatus(1);
-            userInfo.setJoinTime(LocalDateTime.now());
+            this.iUserInfoService.register(email,nickName,password,emailCode);
         } catch (Exception e) {
-            logger.error("注册失败",e);
+            logger.error("注册失败", e);
             throw new BusinessException("注册失败");
         }
         throw new BusinessException("注册失败");
@@ -172,6 +165,7 @@ public class UserInfoController {
 
     /**
      * 重置密码
+     *
      * @param email
      * @param emailCode
      * @param password
@@ -191,7 +185,7 @@ public class UserInfoController {
                 session.removeAttribute(Constants.CHECK_CODE_KEY);
                 return R.error("图片验证码错误");
             }
-            iUserInfoService.resetPwd(email,password,emailCode);
+            iUserInfoService.resetPwd(email, password, emailCode);
 
         } finally {
             session.removeAttribute(Constants.CHECK_CODE_KEY);
@@ -201,25 +195,27 @@ public class UserInfoController {
 
     /**
      * 获取用户信息
+     *
      * @param session
      * @return
      */
     @RequestMapping("/getUserInfo")
-    public R getUserInfo(HttpSession session){
+    public R getUserInfo(HttpSession session) {
         String userId = (String) session.getAttribute(Constants.USER_ID);
         LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(UserInfo::getUserId,userId);
+        queryWrapper.eq(UserInfo::getUserId, userId);
         UserInfo user = iUserInfoService.getOne(queryWrapper);
-        return user==null ? R.error("获取信息失败") : R.success(user);
+        return user == null ? R.error("获取信息失败") : R.success(user);
     }
 
     /**
      * 退出登录
+     *
      * @param session
      * @return
      */
     @RequestMapping("/logout")
-    public R logout(HttpSession session){
+    public R logout(HttpSession session) {
         session.removeAttribute(Constants.USER_ID);
         return R.success("退出成功");
     }

@@ -18,18 +18,4 @@ import javax.annotation.Resource;
  * @since 2023-04-24
  */
 @RestController
-public class SysSettingController {
-
-    @Resource
-    private ISysSettingService iSysSettingService;
-
-    /**
-     * 获取系统设置
-     * @return
-     */
-    @RequestMapping("/getSysSetting")
-    public R getSysSetting(){
-        return R.success(iSysSettingService.list());
-    }
-
-}
+public class SysSettingController { }
