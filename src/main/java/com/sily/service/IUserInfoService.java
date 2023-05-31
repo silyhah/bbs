@@ -2,6 +2,8 @@ package com.sily.service;
 
 import com.sily.entity.UserInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.sily.entity.enums.UserIntegralOperationTypeEnum;
+import com.sily.entity.enums.UserIntegralTypeEnum;
 
 /**
  * <p>
@@ -17,5 +19,9 @@ public interface IUserInfoService extends IService<UserInfo> {
 
 
     void register(String email,String nickName, String password,String emailCode);
+
+    void updateUserIntegral(String userId, UserIntegralOperationTypeEnum userIntegralOperationTypeEnum, UserIntegralTypeEnum userIntegralTypeEnum, Integer integral);
+
+
 
 }

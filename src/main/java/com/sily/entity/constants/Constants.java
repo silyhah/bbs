@@ -6,11 +6,17 @@ public class Constants {
     public static final Integer ONE = 1;
     public static final Integer FIVE = 5;
 
+
+    public static final Integer INTEGRAL_5 = 5;
+
+
+
     public static final String CHECK_CODE_KEY = "check_code_key";
     public static final String CHECK_CODE_KEY_EMAIL = "check_code_key_email";
     public static final String USER_ID = "user_id";
 
     public static final Integer LENGTH_30 = 30;
+    public static final Integer LENGTH_10 = 10;
 
     public static final Integer STATUS_0 = 0;
 
