@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sily.mapper.UserInfoMapper">
+
+    <update id="updateUserIntegral">
+        update user_info
+        set current_integral = current_integral + #{integral}
+        <if test="integral>0">
+            total_integral = total_integral + #{integral}
+        </if>
+        where user_id = #{userId}
+        <![CDATA[and current_integral + #{integral} >=0]]>
+    </update>
+</mapper>
