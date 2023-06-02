@@ -1,6 +1,7 @@
 package com.sily.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.sily.annoation.IP;
 import com.sily.annoation.VerifyParam;
 import com.sily.common.R;
 import com.sily.entity.ForumBoard;
@@ -34,6 +35,7 @@ public class ForumBoardController {
      * @return
      */
     @GetMapping("/board/loadBoard")
+    @IP(getIp = true)
     public R listAll() {
         return R.success(iForumBoardService.getBoardTree(Constants.P_BOARD_ID));
     }

@@ -3,7 +3,7 @@ package com.sily.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.sily.annoation.GlobalInterceptor;
 import com.sily.annoation.VerifyParam;
-import com.sily.common.BusinessException;
+import com.sily.Exception.BusinessException;
 import com.sily.common.CreateImageCode;
 import com.sily.common.R;
 import com.sily.entity.UserInfo;
@@ -15,15 +15,12 @@ import com.sily.service.IUserInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 
 /**

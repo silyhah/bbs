@@ -1,18 +1,15 @@
 package com.sily.controller;
 
 import com.sily.Utils.StringTools;
-import com.sily.annoation.GlobalInterceptor;
-import com.sily.common.BusinessException;
+import com.sily.Exception.BusinessException;
 import com.sily.common.R;
 import com.sily.entity.constants.Constants;
 import org.apache.commons.lang3.ArrayUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
