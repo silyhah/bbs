@@ -12,6 +12,13 @@ public class WebConfig extends AppConfig {
     @Value("${spring.mail.username:}")
     private String sendUserName;
 
+    @Value("${admin.email}")
+    private String adminEmail;
+
+    public String getAdminEmail() {
+        return adminEmail;
+    }
+
     public String getSendUserName() {
         return sendUserName;
     }

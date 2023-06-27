@@ -5,6 +5,9 @@
 <mapper namespace="com.sily.mapper.EmailCodeMapper">
 
     <update id="disableEmailCode">
-        update email_code set status = 1 where email = #{email} and status = 0
+        update email_code
+        set status = 1
+        where email = #{email}
+          and status = 0
     </update>
 </mapper>

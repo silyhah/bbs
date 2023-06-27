@@ -2,28 +2,28 @@ package com.sily.aspect;
 
 import com.sily.Utils.*;
 import com.sily.annoation.GlobalInterceptor;
-import com.sily.annoation.IP;
 import com.sily.annoation.VerifyParam;
 import com.sily.Exception.BusinessException;
 import com.sily.entity.constants.Constants;
+import com.sily.entity.enums.ResponseCodeEnum;
 import org.apache.commons.lang3.ArrayUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.text.MessageFormat;
 
 @Aspect
 @Component
-@Order(0)
 public class OperationAspect {
 
     private static final String[] TYPE_BASE = {"java.lang.String", "java.lang.Integer", "java.lang.Long"};
@@ -43,7 +43,6 @@ public class OperationAspect {
             String methodName = point.getSignature().getName();
             Class<?>[] parameter = ((MethodSignature) point.getSignature()).getMethod().getParameterTypes();
             Method method = target.getClass().getMethod(methodName, parameter);
-            IP ip = method.getAnnotation(IP.class);
 
             GlobalInterceptor interceptor = method.getAnnotation(GlobalInterceptor.class);
 
@@ -66,6 +65,15 @@ public class OperationAspect {
         } catch (Throwable e) {
             logger.error("全局拦截器错误",e);
             throw new BusinessException("500");
+        }
+    }
+
+    private void checkLogin(){
+        HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpSession session = request.getSession();
+        Object sessionWebDto = session.getAttribute(Constants.SESSION_KEY);
+        if (sessionWebDto==null){
+            throw new BusinessException(ResponseCodeEnum.EXPIRED);
         }
     }
 

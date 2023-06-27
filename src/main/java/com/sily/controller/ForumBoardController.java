@@ -1,7 +1,6 @@
 package com.sily.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.sily.annoation.IP;
 import com.sily.annoation.VerifyParam;
 import com.sily.common.R;
 import com.sily.entity.ForumBoard;
@@ -11,8 +10,6 @@ import com.sily.service.IForumBoardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * <p>
@@ -34,8 +31,7 @@ public class ForumBoardController {
      *
      * @return
      */
-    @GetMapping("/board/loadBoard")
-    @IP(getIp = true)
+    @PostMapping("/board/loadBoard")
     public R listAll() {
         return R.success(iForumBoardService.getBoardTree(Constants.P_BOARD_ID));
     }

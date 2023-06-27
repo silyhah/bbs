@@ -8,6 +8,7 @@ public class SessionWebUserDto {
     private String userId;
     private Boolean isAdmin;
 
+
     @Override
     public String toString() {
         return "SessionWebUserDto{" +

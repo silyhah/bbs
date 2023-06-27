@@ -1,22 +1,25 @@
 package com.sily.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.sily.Utils.IPUtil;
 import com.sily.Utils.StringTools;
 import com.sily.Utils.SysCacheUtils;
 import com.sily.Exception.BusinessException;
+import com.sily.config.WebConfig;
 import com.sily.entity.UserInfo;
 import com.sily.entity.UserIntegralRecord;
 import com.sily.entity.UserMessage;
 import com.sily.entity.constants.Constants;
-import com.sily.entity.enums.MessageStatusEnum;
-import com.sily.entity.enums.MessageTypeEnum;
-import com.sily.entity.enums.UserIntegralOperationTypeEnum;
-import com.sily.entity.enums.UserIntegralTypeEnum;
+import com.sily.entity.dto.SessionWebUserDto;
+import com.sily.entity.enums.*;
 import com.sily.mapper.UserInfoMapper;
 import com.sily.mapper.UserIntegralRecordMapper;
 import com.sily.service.IEmailCodeService;
 import com.sily.service.IUserInfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
@@ -48,6 +51,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
     @Resource
     private UserIntegralRecordMapper userIntegralRecordMapper;
+
+    @Resource
+    private WebConfig webConfig;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -128,6 +134,36 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         if (count<=0){
             throw new BusinessException("用户更新积分失败");
         }
+    }
+
+
+    public SessionWebUserDto login(String email, String password){
+        LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UserInfo::getEmail,email);
+        UserInfo user = this.userInfoMapper.selectOne(queryWrapper);
+        if (user==null||!user.getPassword().equals(password)){
+            throw new BusinessException("用户名或者密码错误");
+        }
+        if (UserInfoStatusEnum.DISABLE.getType().equals(user.getStatus())){
+            throw new BusinessException("账号已经被禁用");
+        }
+
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserId(user.getUserId());
+        userInfo.setLastLoginTime(LocalDateTime.now());
+        userInfoMapper.updateById(userInfo);
+
+        SessionWebUserDto sessionWebUserDto = new SessionWebUserDto();
+        sessionWebUserDto.setNickName(user.getNickName());
+        sessionWebUserDto.setUserId(user.getUserId());
+        sessionWebUserDto.setProvince(IPUtil.getAddr());
+        if (!StringTools.isEmpty(webConfig.getAdminEmail())&& ArrayUtils.contains(webConfig.getAdminEmail().split(","),user.getEmail())){
+            sessionWebUserDto.setAdmin(true);
+        }else{
+            sessionWebUserDto.setAdmin(false);
+        }
+        return sessionWebUserDto;
+
     }
 
 

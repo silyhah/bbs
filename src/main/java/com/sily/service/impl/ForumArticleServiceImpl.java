@@ -46,4 +46,5 @@ public class ForumArticleServiceImpl extends ServiceImpl<ForumArticleMapper, For
         }
         return forumArticle;
     }
+
 }
