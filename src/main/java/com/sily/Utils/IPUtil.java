@@ -33,4 +33,17 @@ public class IPUtil {
         return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
     }
 
+
+    public static String getIp(){
+        HttpServletRequest request = HttpContextUtil.getHttpServletRequest();
+        String ipAddr = IPUtil.getIpAddr(request);
+        return ipAddr;
+    }
+
+    public static String getAddr(){
+        HttpServletRequest request = HttpContextUtil.getHttpServletRequest();
+        String ipAddr = IPUtil.getIpAddr(request);
+        return AddressUtil.getCityInfo(ipAddr);
+    }
+
 }

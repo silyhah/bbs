@@ -3,16 +3,20 @@ package com.sily.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sily.Utils.StringTools;
+import com.sily.annoation.GlobalInterceptor;
 import com.sily.annoation.VerifyParam;
 import com.sily.Exception.BusinessException;
 import com.sily.common.R;
 import com.sily.entity.ForumArticle;
 import com.sily.entity.ForumArticleAttachment;
 import com.sily.entity.ForumBoard;
+import com.sily.entity.PageInfo;
 import com.sily.entity.constants.Constants;
 import com.sily.entity.enums.ArticleOrderTypeEnum;
 import com.sily.entity.enums.ArticleStatusEnum;
+import com.sily.entity.enums.UpdateArticleCountTypeEnum;
 import com.sily.entity.vo.FormArticleDetailVo;
+import com.sily.mapper.ForumArticleMapper;
 import com.sily.service.IForumArticleAttachmentService;
 import com.sily.service.IForumArticleService;
 import com.sily.service.IForumBoardService;
@@ -23,7 +27,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  * <p>
@@ -42,10 +48,11 @@ public class ForumArticleController {
     @Autowired
     private IForumBoardService iForumBoardService;
 
+    @Resource
+    private ForumArticleMapper forumArticleMapper;
+
     @Autowired
     private IForumArticleAttachmentService iForumArticleAttachmentService;
-
-
 
 
     /**
@@ -59,25 +66,29 @@ public class ForumArticleController {
      */
     @RequestMapping("/forum/loadArticle")
     public R loadArticle(Integer pBoardId, Integer boardId,
-                         @RequestHeader(defaultValue = "0") Integer orderType,
-                         @RequestHeader(defaultValue = "1") Integer pageNo) {
+                            @RequestHeader(defaultValue = "0") Integer orderType,
+                            @RequestHeader(defaultValue = "1") Integer pageNo) {
         LambdaQueryWrapper<ForumArticle> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(pBoardId!=null,ForumArticle::getpBoardId, pBoardId)
-                .eq(boardId!=null, ForumArticle::getBoardId, boardId);
-
-        if (orderType.equals(ArticleOrderTypeEnum.HOT.getType())){
+        queryWrapper.eq(pBoardId != null, ForumArticle::getpBoardId, pBoardId)
+                .eq(boardId != null, ForumArticle::getBoardId, boardId);
+        if (orderType.equals(ArticleOrderTypeEnum.HOT.getType())) {
             queryWrapper.orderByDesc(ForumArticle::getTopType)
                     .orderByAsc(ForumArticle::getReadCount)
                     .orderByAsc(ForumArticle::getGoodCount)
                     .orderByAsc(ForumArticle::getCommentCount);
-        }else if(orderType.equals(ArticleOrderTypeEnum.NEW.getType())){
+        } else if (orderType.equals(ArticleOrderTypeEnum.NEW.getType())) {
             queryWrapper.orderByAsc(ForumArticle::getPostTime);
-        }else{
+        } else {
             queryWrapper.orderByDesc(ForumArticle::getPostTime);
         }
-        Page<ForumArticle> page = new Page<>(pageNo, 15);
-
-        return R.success(iForumArticleService.page(page, queryWrapper));
+        List<ForumArticle> list = iForumArticleService.list(queryWrapper);
+        PageInfo<ForumArticle> pageInfo = new PageInfo<>();
+        pageInfo.setPageNo(pageNo);
+        pageInfo.setPageSize(15);
+        pageInfo.setTotalCount(1);
+        pageInfo.setPageTotal(1);
+        pageInfo.setList(list);
+        return R.success(pageInfo);
     }
 
 
@@ -91,17 +102,19 @@ public class ForumArticleController {
     public R getArticleDetail(@VerifyParam(required = true) String articleId) {
         ForumArticle forumArticle = iForumArticleService.readArticle(articleId);
 
-        if (ArticleStatusEnum.REVIEW.getStatus().equals(forumArticle.getStatus())||
-        ArticleStatusEnum.DELETE.getStatus().equals(forumArticle.getStatus())){
+        if (ArticleStatusEnum.REVIEW.getStatus().equals(forumArticle.getStatus()) ||
+                ArticleStatusEnum.DELETE.getStatus().equals(forumArticle.getStatus())) {
             throw new BusinessException("404");
         }
         FormArticleDetailVo formArticleDetailVo = new FormArticleDetailVo();
         formArticleDetailVo.setForumArticle(forumArticle);
-        if (forumArticle.getStatus().equals(Constants.ONE)){
+        if (forumArticle.getStatus().equals(Constants.ONE)) {
             LambdaQueryWrapper<ForumArticleAttachment> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(ForumArticleAttachment::getArticleId,articleId);
+            queryWrapper.eq(ForumArticleAttachment::getArticleId, articleId);
             ForumArticleAttachment forumArticleAttachment = iForumArticleAttachmentService.getOne(queryWrapper);
-            BeanUtils.copyProperties(formArticleDetailVo.getForumArticleAttachmentVo(),forumArticleAttachment);
+            if (forumArticleAttachment!=null){
+                BeanUtils.copyProperties(formArticleDetailVo.getForumArticleAttachmentVo(), forumArticleAttachment);
+            }
         }
         return R.success(formArticleDetailVo);
     }
@@ -113,15 +126,10 @@ public class ForumArticleController {
      * @return
      */
     @RequestMapping("/forum/doLike")
-    public R doLike(String articleId) {
-        if (StringTools.isEmpty(articleId)) {
-            return R.error("没有查到");
-        }
-        LambdaQueryWrapper<ForumArticle> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ForumArticle::getArticleId, articleId);
-        ForumArticle one = iForumArticleService.getOne(queryWrapper);
-        one.setGoodCount(one.getGoodCount() + 1);
-        return R.success("点赞成功");
+    @GlobalInterceptor(checkLogin = true, checkParam = true)
+    public R doLike(@VerifyParam(required = true) String articleId) {
+        forumArticleMapper.updateArticleCount(UpdateArticleCountTypeEnum.GOOD_COUNT.getUpdateType(),Constants.ONE,articleId);
+        return R.success(null);
     }
 
     /**
@@ -163,7 +171,6 @@ public class ForumArticleController {
         LambdaQueryWrapper<ForumBoard> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ForumBoard::getpBoardId, 0);
         return R.success(iForumBoardService.list(queryWrapper));
-
 
 
     }

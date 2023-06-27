@@ -2,6 +2,7 @@ package com.sily.service;
 
 import com.sily.entity.ForumArticle;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -14,5 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface IForumArticleService extends IService<ForumArticle> {
 
     ForumArticle readArticle(String articleId);
+
 
 }

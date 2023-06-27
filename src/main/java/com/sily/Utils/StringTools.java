@@ -1,7 +1,6 @@
 package com.sily.Utils;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 
 public class StringTools {
     public static boolean isEmpty(String str){

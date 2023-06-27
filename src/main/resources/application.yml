@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 7070
   servlet:
     context-path: /api
     session:
@@ -9,9 +9,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.231.128:3306/rain?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://8.130.120.42/rain?useSSL=false&serverTimezone=GMT
     username: root
-    password: password
+    password: 123456
   main:
     allow-circular-references: true
   mail:
@@ -19,7 +19,7 @@ spring:
     host: smtp.qq.com
     port: 587
     username: 2664067940@qq.com
-    password:
+    password: kqdchgesjhqrecea
     test-connection: false
     properties:
       mail:
@@ -30,13 +30,10 @@ spring:
           auth: false
         default-encoding: UTF-8
 
-project:
-  folder: D://untitled/bbs/
 inner:
   api:
     appKey: easybbs
     appSecrcet: easybbs_key
-isDev: true
 admin:
   email: 2664067940@qq.com
   account: admin

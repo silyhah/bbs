@@ -1,6 +1,7 @@
 package com.sily.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.sily.Utils.SysCacheUtils;
 import com.sily.annoation.GlobalInterceptor;
 import com.sily.annoation.VerifyParam;
 import com.sily.Exception.BusinessException;
@@ -8,6 +9,9 @@ import com.sily.common.CreateImageCode;
 import com.sily.common.R;
 import com.sily.entity.UserInfo;
 import com.sily.entity.constants.Constants;
+import com.sily.entity.dto.SessionWebUserDto;
+import com.sily.entity.dto.SysSetting4CommentDto;
+import com.sily.entity.dto.SysSettingDto;
 import com.sily.entity.enums.CheckCodeTypeEnum;
 import com.sily.entity.enums.VerifyRegexEnum;
 import com.sily.service.IEmailCodeService;
@@ -18,9 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -32,7 +39,7 @@ import java.io.IOException;
  * @since 2023-04-24
  */
 @RestController
-public class UserInfoController {
+public class UserInfoController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserInfoController.class);
 
@@ -85,25 +92,29 @@ public class UserInfoController {
     @GlobalInterceptor(checkParam = true)
     public R login(HttpSession session,
                    @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL) String email,
-                   @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String password,
+                   @VerifyParam(required = true) String password,
                    @VerifyParam(required = true) String checkCode) {
         try {
             if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))) {
                 throw new BusinessException("图片验证码错误");
             }
-            LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(UserInfo::getEmail, email);
-            UserInfo userInfo = iUserInfoService.getOne(queryWrapper);
-            if (userInfo == null || !password.equals(userInfo.getPassword())) {
-                throw new BusinessException("用户名或者密码错误");
-            }
-            if (userInfo.getStatus().equals(Constants.STATUS_0)) {
-                throw new BusinessException("账号被禁用");
-            }
+            SessionWebUserDto sessionWebUserDto = iUserInfoService.login(email, password);
+            session.setAttribute(Constants.SESSION_KEY, sessionWebUserDto);
         } finally {
             session.removeAttribute(Constants.CHECK_CODE_KEY);
         }
-        return R.success("登录成功");
+        return R.success("登陆成功");
+    }
+
+
+    /**
+     * 获取用户信息
+     * @param session
+     * @return
+     */
+    @RequestMapping("/getUserInfo")
+    public R getUserInfo(HttpSession session) {
+        return R.success(getUser(session));
     }
 
     /**
@@ -148,11 +159,10 @@ public class UserInfoController {
                       @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String emailCode,
                       @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String checkCode) {
         try {
-            if (!session.getAttribute(Constants.CHECK_CODE_KEY).equals(checkCode))
-            {
+            if (!session.getAttribute(Constants.CHECK_CODE_KEY).equals(checkCode)) {
                 throw new BusinessException("图片验证码错误");
             }
-            this.iUserInfoService.register(email,nickName,password,emailCode);
+            this.iUserInfoService.register(email, nickName, password, emailCode);
         } catch (Exception e) {
             logger.error("注册失败", e);
             throw new BusinessException("注册失败");
@@ -190,20 +200,6 @@ public class UserInfoController {
         return R.success(null);
     }
 
-    /**
-     * 获取用户信息
-     *
-     * @param session
-     * @return
-     */
-    @RequestMapping("/getUserInfo")
-    public R getUserInfo(HttpSession session) {
-        String userId = (String) session.getAttribute(Constants.USER_ID);
-        LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(UserInfo::getUserId, userId);
-        UserInfo user = iUserInfoService.getOne(queryWrapper);
-        return user == null ? R.error("获取信息失败") : R.success(user);
-    }
 
     /**
      * 退出登录
@@ -213,8 +209,22 @@ public class UserInfoController {
      */
     @RequestMapping("/logout")
     public R logout(HttpSession session) {
-        session.removeAttribute(Constants.USER_ID);
-        return R.success("退出成功");
+        session.invalidate();
+        return R.success(null);
+    }
+
+
+    /**
+     * 获取系统设置
+     * @return
+     */
+    @RequestMapping("/getSysSetting")
+    public R getSysSetting() {
+        SysSettingDto sysSetting = SysCacheUtils.getSysSetting();
+        SysSetting4CommentDto commentSetting = sysSetting.getCommentSetting();
+        Map<String,Object> map = new HashMap<>();
+        map.put("commentOpen",commentSetting);
+        return R.success(map);
     }
 
 }

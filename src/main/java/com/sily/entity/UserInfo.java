@@ -1,5 +1,6 @@
 package com.sily.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -23,6 +24,7 @@ public class UserInfo implements Serializable {
     /**
      * 用户ID
      */
+    @TableId
     private String userId;
 
     /**
